@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="id" translate="no">
+<head>
+<meta charset="UTF-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Siapakah Aku? : Tokoh Alkitab</title>
+<meta name="description" content="Game edukasi tebak tokoh Alkitab lewat emoji. Kelompok 1 TPB Agama 142.">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+</head>
+<body>
+
+<div class="bg-glass" aria-hidden="true"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<!-- ===== NAVIGATION BAR ===== -->
+<header class="nav">
+  <a class="brand" href="#beranda" data-nav="beranda">
+    <span class="brand-emoji">📖</span>
+    <span class="brand-text">Siapakah Aku?</span>
+  </a>
+  <nav class="nav-links" aria-label="Navigasi utama">
+    <a href="#beranda" data-nav="beranda">Beranda</a>
+    <a href="#main" data-nav="main">Main</a>
+    <a href="#belajar" data-nav="belajar">Belajar</a>
+    <a href="#tentang" data-nav="tentang">Tentang Kami</a>
+  </nav>
+  <div class="nav-tools">
+    <button id="btnSfx" class="icon-btn" title="Efek suara (M)" aria-label="Efek suara">🔊</button>
+    <button id="btnMusic" class="icon-btn" title="Musik latar" aria-label="Musik latar">🎵</button>
+    <button id="btnFs" class="icon-btn" title="Layar penuh (F)" aria-label="Layar penuh">⛶</button>
+  </div>
+</header>
+
+<main>
+
+<!-- ===== BERANDA ===== -->
+<section id="page-beranda" class="page">
+  <div class="hero">
+    <p class="eyebrow">Game Edukasi · Kelompok 1 TPB Agama 142</p>
+    <h1 class="title">Siapakah Aku?<span>Tokoh Alkitab</span></h1>
+    <div class="hero-emoji" aria-hidden="true">
+      <span>🌳</span><span>🐍</span><span>👫</span>
+    </div>
+    <p class="tagline">Tebak tokoh Alkitab lewat emoji, lalu pelajari kisahnya.</p>
+    <div class="cta">
+      <button class="btn btn-gold btn-lg" data-go="main">▶ Mulai Main</button>
+      <button class="btn btn-ghost btn-lg" data-go="belajar">📚 Belajar Kisah</button>
+    </div>
+    <div class="how">
+      <div><b>1</b><span>Lihat deretan emoji</span></div>
+      <div><b>2</b><span>Pilih satu dari 4 jawaban</span></div>
+      <div><b>3</b><span>Kumpulkan poin dan tokoh</span></div>
+    </div>
+  </div>
+
+  <div class="board card">
+    <div class="board-head">
+      <h2>🏆 Papan Skor</h2>
+      <button id="btnClearBoard" class="link-btn">Reset papan skor</button>
+    </div>
+    <div class="board-tabs" id="boardTabs">
+      <button class="chip active" data-m="1">👤 1 Pemain</button>
+      <button class="chip" data-m="2">👥 2 Pemain</button>
+    </div>
+    <ol id="boardList" class="board-list"></ol>
+    <p id="boardEmpty" class="muted center">Belum ada skor. Jadilah yang pertama!</p>
+  </div>
+</section>
+
+<!-- ===== MAIN ===== -->
+<section id="page-main" class="page hidden">
+
+  <!-- Setup -->
+  <div id="screen-setup" class="screen">
+    <div class="card setup">
+      <h2>Atur Permainan</h2>
+
+      <div class="field">
+        <label>Mode</label>
+        <div class="seg" id="segMode">
+          <button class="seg-btn active" data-v="1">👤 1 Pemain</button>
+          <button class="seg-btn" data-v="2">👥 2 Pemain</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Tingkat Kesulitan</label>
+        <div class="seg" id="segLevel">
+          <button class="seg-btn" data-v="mudah">🌱 Mudah</button>
+          <button class="seg-btn active" data-v="sedang">🔥 Sedang</button>
+          <button class="seg-btn" data-v="sulit">💎 Sulit</button>
+        </div>
+        <p id="levelDesc" class="muted small"></p>
+      </div>
+
+      <div class="field names">
+        <div>
+          <label for="name1">Nama Pemain 1</label>
+          <input id="name1" type="text" maxlength="14" placeholder="Nama / inisial" autocomplete="off">
+        </div>
+        <div id="wrapName2" class="hidden">
+          <label for="name2">Nama Pemain 2</label>
+          <input id="name2" type="text" maxlength="14" placeholder="Nama / inisial" autocomplete="off">
+        </div>
+      </div>
+
+      <ul class="rules">
+        <li>10 soal per sesi, jawab dengan klik atau tombol <kbd>1</kbd>–<kbd>4</kbd></li>
+        <li id="ruleLives">3 ❤️ nyawa. Salah atau waktu habis mengurangi 1 nyawa</li>
+        <li>3× petunjuk per pemain (tombol <kbd>H</kbd>). Petunjuk 1 membuka kitab acuan (poin ×0,75), petunjuk 2 membuka ciri tokoh (poin ×0,5)</li>
+        <li>Jawab cepat dan beruntun untuk bonus waktu dan combo</li>
+      </ul>
+
+      <button id="btnStart" class="btn btn-gold btn-lg wide">Mulai! ✨</button>
+    </div>
+  </div>
+
+  <!-- Quiz -->
+  <div id="screen-quiz" class="screen hidden">
+    <div class="hud">
+      <div id="hudPlayers" class="hud-players"></div>
+      <div class="hud-mid">
+        <span id="hudQ">Soal 1/10</span>
+        <span id="hudLevel" class="tag"></span>
+      </div>
+      <button id="btnQuit" class="link-btn">Keluar</button>
+    </div>
+
+    <div class="timer"><div id="timerBar"></div><span id="timerNum">20</span></div>
+
+    <div class="card quiz">
+      <p id="turnLabel" class="turn hidden"></p>
+      <p class="ask">Siapakah aku?</p>
+      <div id="emojiBox" class="emoji-box" aria-live="polite"></div>
+      <p id="hintBox" class="hint hidden"></p>
+
+      <div id="options" class="options"></div>
+
+      <div class="quiz-tools">
+        <button id="btnHint" class="btn btn-ghost">💡 Petunjuk <kbd>H</kbd></button>
+        <span id="comboLabel" class="combo hidden"></span>
+      </div>
+    </div>
+
+    <!-- Umpan balik -->
+    <div id="feedback" class="feedback hidden" role="dialog" aria-live="assertive">
+      <div class="feedback-card">
+        <div id="fbStatus" class="fb-status"></div>
+        <div id="fbEmoji" class="fb-emoji"></div>
+        <h3 id="fbName"></h3>
+        <p id="fbRef" class="fb-ref"></p>
+        <p id="fbInti" class="fb-inti"></p>
+        <p id="fbPoints" class="fb-points"></p>
+        <div class="fb-actions">
+          <button id="btnReadMore" class="btn btn-ghost">📖 Baca kisahnya</button>
+          <button id="btnNext" class="btn btn-gold">Lanjut ➜ <kbd>Enter</kbd></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hasil -->
+  <div id="screen-result" class="screen hidden">
+    <div class="card result">
+      <p class="eyebrow">Permainan Selesai</p>
+      <div id="resultBody"></div>
+      <div id="missedBox" class="missed hidden">
+        <h3>Tokoh yang perlu dipelajari lagi</h3>
+        <div id="missedList" class="missed-list"></div>
+      </div>
+      <div class="cta">
+        <button id="btnAgain" class="btn btn-gold btn-lg">🔁 Main Lagi</button>
+        <button id="btnToLearn" class="btn btn-ghost btn-lg">📚 Belajar Kisah</button>
+        <button id="btnHome" class="btn btn-ghost btn-lg">🏠 Beranda</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== BELAJAR ===== -->
+<section id="page-belajar" class="page hidden">
+  <div class="page-head">
+    <h2>📚 Belajar Kisah Tokoh Alkitab</h2>
+    <p class="muted">Klik kartu untuk membaca kisahnya. Tokoh yang berhasil kamu tebak akan bertanda ⭐.</p>
+  </div>
+
+  <div class="collection">
+    <div class="collection-top">
+      <span>Koleksi tokoh</span>
+      <b id="collectText">0 / 35</b>
+    </div>
+    <div class="progress"><div id="collectBar"></div></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="chips" id="chips">
+      <button class="chip active" data-f="semua">Semua</button>
+      <button class="chip" data-f="PL">Perjanjian Lama</button>
+      <button class="chip" data-f="PB">Perjanjian Baru</button>
+      <button class="chip" data-f="koleksi">⭐ Koleksiku</button>
+    </div>
+    <input id="search" type="search" placeholder="Cari tokoh..." autocomplete="off">
+  </div>
+
+  <div id="cards" class="cards"></div>
+  <p id="noResult" class="muted center hidden">Tidak ada tokoh yang cocok.</p>
+</section>
+
+<!-- ===== TENTANG KAMI ===== -->
+<section id="page-tentang" class="page hidden">
+  <div class="page-head center">
+    <p class="eyebrow">Tentang Kami</p>
+    <h2 class="about-title">Kelompok 1 · TPB Agama 142</h2>
+    <p class="muted">Universitas Padjadjaran</p>
+  </div>
+
+  <div class="dosen-wrap">
+    <p class="role-label">Dosen Pengampu</p>
+    <div id="dosenFrame"></div>
+  </div>
+
+  <p class="role-label center">Anggota Kelompok</p>
+  <div id="memberGrid" class="member-grid"></div>
+
+  <div class="info-grid">
+    <div class="card info-card">
+      <h3>🎯 Tujuan Proyek</h3>
+      <ul id="goalList"></ul>
+    </div>
+    <div class="card info-card">
+      <h3>📚 Sumber &amp; Referensi</h3>
+      <ol id="sourceList"></ol>
+      <p class="small" style="margin-top:10px">Ringkasan kisah ditulis dengan kata-kata kelompok sendiri. Untuk teks ayat yang lengkap, silakan membaca langsung di Alkitab.</p>
+    </div>
+  </div>
+
+  <p class="thanks center">Terima kasih sudah bermain. Semoga kisah-kisah ini menguatkan kita semua. 🕊️</p>
+</section>
+
+</main>
+
+<!-- ===== MODAL KISAH ===== -->
+<div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="mName">
+  <div class="modal-card">
+    <button id="modalClose" class="modal-close" aria-label="Tutup">✕</button>
+    <div id="mEmoji" class="m-emoji"></div>
+    <div class="m-tags"><span id="mTest" class="tag"></span><span id="mLevel" class="tag"></span></div>
+    <h2 id="mName"></h2>
+    <p id="mRef" class="fb-ref"></p>
+    <div id="mStory" class="m-story"></div>
+    <div class="m-lesson">
+      <b>Apa yang bisa kita pelajari?</b>
+      <p id="mLesson"></p>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+Taruh foto di folder ini dengan nama file persis seperti berikut:
+
+dosen.jpg      -> dr. Hanna, M.Kes., Ph.D.
+cristian.jpg   -> Cristian Rafael Simangunsong
+chersten.jpg   -> Chersten Anshel Eunike Ginting
+farrel.jpg     -> Farrel Nathanael Sutrisna
+irene.jpg      -> Irene Amazia Damanik
+josaphat.jpg   -> Josaphat Matogu Parulian Gultom
+margreth.jpg   -> Margreth Tambunan
+rhenasya.jpg   -> Rhenasya Joyce Auberta
+
+Saran: format JPG, rasio portrait 3:4 (sekitar 600x800 px), wajah/setengah badan, cahaya terang.
+Kalau foto belum ada, frame otomatis menampilkan inisial nama.
+Kalau fotomu berformat PNG, ubah ekstensinya di bagian CONFIG pada app.js.
